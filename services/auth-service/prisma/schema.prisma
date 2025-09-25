@@ -1,0 +1,42 @@
+// Auth Service Database Schema
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../node_modules/.prisma/auth-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("AUTH_DATABASE_URL")
+}
+
+// Auth service only needs user authentication data
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  firstName String?  @map("first_name")
+  lastName  String?  @map("last_name")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  isRevoked Boolean  @default(false) @map("is_revoked")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
