@@ -1,0 +1,119 @@
+version: '3.8'
+
+services:
+  # Auth Service Database
+  auth-db:
+    image: postgres:15-alpine
+    container_name: auth-database
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${AUTH_DB_USER:-auth_user}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD:-auth_password}
+      POSTGRES_DB: ${AUTH_DB_NAME:-auth_db}
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${AUTH_DB_USER:-auth_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - microservices-network
+
+  # User Service Database
+  user-db:
+    image: postgres:15-alpine
+    container_name: user-database
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${USER_DB_USER:-user_user}
+      POSTGRES_PASSWORD: ${USER_DB_PASSWORD:-user_password}
+      POSTGRES_DB: ${USER_DB_NAME:-user_db}
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${USER_DB_USER:-user_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - microservices-network
+
+  # Post Service Database
+  post-db:
+    image: postgres:15-alpine
+    container_name: post-database
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POST_DB_USER:-post_user}
+      POSTGRES_PASSWORD: ${POST_DB_PASSWORD:-post_password}
+      POSTGRES_DB: ${POST_DB_NAME:-post_db}
+    volumes:
+      - post_db_data:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POST_DB_USER:-post_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - microservices-network
+
+  # Message Broker
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: microservices-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-admin}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-password}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - microservices-network
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: microservices-redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - microservices-network
+
+volumes:
+  auth_db_data:
+    driver: local
+  user_db_data:
+    driver: local
+  post_db_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  microservices-network:
+    driver: bridge

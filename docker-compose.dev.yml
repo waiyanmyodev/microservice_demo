@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # Auth Service - Development
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile.dev
+      target: development
+    container_name: microservices-auth-dev
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./services/auth-service/src:/app/src
+      - ./shared/src:/app/shared/src
+      - /app/node_modules
+    command: npm run start:dev
+
+  # User Service - Development
+  user-service:
+    build:
+      context: .
+      dockerfile: services/user-service/Dockerfile.dev
+      target: development
+    container_name: microservices-user-dev
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./services/user-service/src:/app/src
+      - ./services/user-service/prisma:/app/prisma
+      - ./shared/src:/app/shared/src
+      - /app/node_modules
+    command: npm run start:dev
+
+  # Post Service - Development
+  post-service:
+    build:
+      context: .
+      dockerfile: services/post-service/Dockerfile.dev
+      target: development
+    container_name: microservices-post-dev
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./services/post-service/src:/app/src
+      - ./shared/src:/app/shared/src
+      - /app/node_modules
+    command: npm run start:dev
+
+  # API Gateway - Development
+  api-gateway:
+    build:
+      context: .
+      dockerfile: services/api-gateway/Dockerfile.dev
+      target: development
+    container_name: microservices-gateway-dev
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./services/api-gateway/src:/app/src
+      - ./shared/src:/app/shared/src
+      - /app/node_modules
+    command: npm run start:dev
