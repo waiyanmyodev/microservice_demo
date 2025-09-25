@@ -1,0 +1,51 @@
+// Post Service Database Schema
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../node_modules/.prisma/post-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POST_DATABASE_URL")
+}
+
+// Post service only stores author ID reference, not full user data
+model Post {
+  id          String    @id @default(uuid())
+  title       String
+  content     String
+  excerpt     String?
+  slug        String?   @unique
+  published   Boolean   @default(false)
+  authorId    String    @map("author_id") // Reference to user in User service
+  tags        String[]  @default([])
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  publishedAt DateTime? @map("published_at")
+
+  @@map("posts")
+}
+
+// Post service events for analytics
+model PostEvent {
+  id        String   @id @default(uuid())
+  postId    String   @map("post_id")
+  eventType String   @map("event_type") // 'created', 'published', 'updated', 'deleted'
+  authorId  String   @map("author_id")
+  eventData Json?    @map("event_data")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("post_events")
+}
+
+// Post view analytics
+model PostView {
+  id         String   @id @default(uuid())
+  postId     String   @map("post_id")
+  viewerId   String?  @map("viewer_id") // Optional user ID
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("post_views")
+}
