@@ -1,0 +1,39 @@
+// User Service Database Schema
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../node_modules/.prisma/user-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("USER_DATABASE_URL")
+}
+
+// User service manages detailed user profiles
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  username  String   @unique
+  firstName String?  @map("first_name")
+  lastName  String?  @map("last_name")
+  avatar    String?
+  bio       String?
+  location  String?
+  website   String?
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+// User service maintains user events for audit
+model UserEvent {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  eventType String   @map("event_type") // 'created', 'updated', 'deactivated'
+  eventData Json?    @map("event_data")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("user_events")
+}
