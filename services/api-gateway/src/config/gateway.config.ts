@@ -10,15 +10,15 @@ export default registerAs('gateway', () => ({
   services: {
     auth: {
       host: process.env.AUTH_SERVICE_HOST || 'localhost',
-      port: parseInt(process.env.AUTH_SERVICE_PORT || '3001', 10),
+      port: parseInt(process.env.AUTH_SERVICE_TCP_PORT || '3011', 10),
     },
     user: {
       host: process.env.USER_SERVICE_HOST || 'localhost',
-      port: parseInt(process.env.USER_SERVICE_PORT || '3002', 10),
+      port: parseInt(process.env.USER_SERVICE_TCP_PORT || '3012', 10),
     },
     post: {
       host: process.env.POST_SERVICE_HOST || 'localhost',
-      port: parseInt(process.env.POST_SERVICE_PORT || '3003', 10),
+      port: parseInt(process.env.POST_SERVICE_TCP_PORT || '3013', 10),
     },
   },
   throttle: {

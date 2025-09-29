@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaClient } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import {
   LoginDto,
@@ -11,16 +11,13 @@ import {
   IJwtPayload,
   ITokens,
   UserAlreadyExistsException,
-  ValidationException,
   InvalidTokenException,
-  SUCCESS_MESSAGES,
 } from '@shared/common';
 
 @Injectable()
 export class AuthService {
-  private prisma = new PrismaClient();
-
   constructor(
+    private prisma: PrismaService,
     private jwtService: JwtService,
     private configService: ConfigService,
   ) {}
@@ -86,9 +83,7 @@ export class AuthService {
     });
 
     if (existingUser) {
-      throw new UserAlreadyExistsException(
-        'User with this email or username already exists',
-      );
+      throw new UserAlreadyExistsException('User with this email or username already exists');
     }
 
     // Hash password
@@ -132,7 +127,7 @@ export class AuthService {
 
   async refreshTokens(refreshTokenDto: RefreshTokenDto): Promise<ITokens> {
     try {
-      const payload = this.jwtService.verify(refreshTokenDto.refreshToken, {
+      this.jwtService.verify(refreshTokenDto.refreshToken, {
         secret: this.configService.get<string>('auth.jwt.refreshSecret'),
       });
 
@@ -193,7 +188,7 @@ export class AuthService {
   private async saveRefreshToken(userId: string, token: string): Promise<void> {
     const expiresIn = this.configService.get<string>('auth.jwt.refreshExpiresIn') || '7d';
     const expiresAt = new Date();
-    
+
     // Parse expiration time (e.g., '7d' -> 7 days)
     if (expiresIn.endsWith('d')) {
       const days = parseInt(expiresIn.replace('d', ''), 10);

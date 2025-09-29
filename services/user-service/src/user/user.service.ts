@@ -11,7 +11,7 @@ import {
   UserAlreadyExistsException,
 } from '@shared/common';
 import { UserRepository } from '../repository/user.repository';
-import { User } from '@prisma/client';
+import { User } from '../../node_modules/.prisma/user-client';
 
 @Injectable()
 export class UserService {

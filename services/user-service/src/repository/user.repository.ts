@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { PrismaClient, User } from '@prisma/client';
+import { PrismaClient, User } from '../../node_modules/.prisma/user-client';
 import {
   CreateUserDto,
   UpdateUserDto,
@@ -39,7 +39,7 @@ export class UserRepository implements OnModuleInit, OnModuleDestroy {
 
     // Build where clause
     const where: any = {};
-    
+
     if (isActive !== undefined) {
       where.isActive = isActive;
     }

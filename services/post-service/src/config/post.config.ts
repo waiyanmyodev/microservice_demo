@@ -4,6 +4,7 @@ export default registerAs('post', () => ({
   service: {
     port: parseInt(process.env.POST_SERVICE_PORT || '3003', 10),
     host: process.env.POST_SERVICE_HOST || '0.0.0.0',
+    tcpPort: parseInt(process.env.POST_SERVICE_TCP_PORT || '3013', 10) || 3013,
   },
   database: {
     url:

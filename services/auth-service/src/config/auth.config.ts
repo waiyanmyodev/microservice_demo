@@ -13,8 +13,10 @@ export default registerAs('auth', () => ({
   service: {
     port: parseInt(process.env.AUTH_SERVICE_PORT || '3001', 10) || 3001,
     host: process.env.AUTH_SERVICE_HOST || '0.0.0.0',
+    tcpPort: parseInt(process.env.AUTH_SERVICE_TCP_PORT || '3011', 10) || 3011,
   },
   database: {
-    url: process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/microservices_db',
+    url:
+      process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/microservices_db',
   },
 }));

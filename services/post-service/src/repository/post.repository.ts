@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { PrismaClient, Post } from '@prisma/client';
+import { PrismaClient, Post } from '../../node_modules/.prisma/post-client';
 import {
   CreatePostDto,
   UpdatePostDto,

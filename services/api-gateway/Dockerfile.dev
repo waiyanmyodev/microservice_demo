@@ -23,6 +23,9 @@ RUN npm run build:shared
 # Set working directory to the service
 WORKDIR /app/services/api-gateway
 
+# Install service-specific dependencies
+RUN npm ci
+
 # Expose port
 EXPOSE 3000
 
