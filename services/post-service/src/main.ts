@@ -10,8 +10,8 @@ async function bootstrap() {
   const logger = new Logger('PostService');
 
   // Get configuration
-  const port = configService.get<number>('post.service.port');
-  const host = configService.get<string>('post.service.host');
+  const port = configService.get<number>('post.service.port') || 3003;
+  const host = configService.get<string>('post.service.host') || '0.0.0.0';
 
   // Configure microservice
   app.connectMicroservice<MicroserviceOptions>({
@@ -47,7 +47,7 @@ async function bootstrap() {
   logger.log(`🚀 Post microservice is running on ${host}:${port}`);
 }
 
-bootstrap().catch((error) => {
+bootstrap().catch(error => {
   Logger.error('❌ Failed to start post service', error);
   process.exit(1);
 });

@@ -1,7 +1,6 @@
 // User Service Database Schema
 generator client {
   provider = "prisma-client-js"
-  output   = "../../../node_modules/.prisma/user-client"
 }
 
 datasource db {

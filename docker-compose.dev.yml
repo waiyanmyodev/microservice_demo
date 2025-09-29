@@ -6,10 +6,18 @@ services:
     build:
       context: .
       dockerfile: services/auth-service/Dockerfile.dev
-      target: development
     container_name: microservices-auth-dev
     environment:
       - NODE_ENV=development
+      - AUTH_DATABASE_URL=postgresql://auth_user:auth_password@auth-db:5432/auth_db?schema=public
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-this-in-production}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-your-super-secret-refresh-jwt-key-change-this-in-production}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-15m}
+      - JWT_REFRESH_EXPIRES_IN=${JWT_REFRESH_EXPIRES_IN:-7d}
+      - AUTH_SERVICE_PORT=${AUTH_SERVICE_PORT:-3001}
+      - RABBITMQ_URL=amqp://admin:password@rabbitmq:5672
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     volumes:
       - ./services/auth-service/src:/app/src
       - ./shared/src:/app/shared/src
@@ -21,10 +29,16 @@ services:
     build:
       context: .
       dockerfile: services/user-service/Dockerfile.dev
-      target: development
     container_name: microservices-user-dev
     environment:
       - NODE_ENV=development
+      - USER_DATABASE_URL=postgresql://user_user:user_password@user-db:5432/user_db?schema=public
+      - USER_SERVICE_PORT=${USER_SERVICE_PORT:-3002}
+      - RABBITMQ_URL=amqp://admin:password@rabbitmq:5672
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - AUTH_SERVICE_HOST=auth-service
+      - AUTH_SERVICE_PORT=3001
     volumes:
       - ./services/user-service/src:/app/src
       - ./services/user-service/prisma:/app/prisma
@@ -37,10 +51,18 @@ services:
     build:
       context: .
       dockerfile: services/post-service/Dockerfile.dev
-      target: development
     container_name: microservices-post-dev
     environment:
       - NODE_ENV=development
+      - POST_DATABASE_URL=postgresql://post_user:post_password@post-db:5432/post_db?schema=public
+      - POST_SERVICE_PORT=${POST_SERVICE_PORT:-3003}
+      - RABBITMQ_URL=amqp://admin:password@rabbitmq:5672
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - AUTH_SERVICE_HOST=auth-service
+      - AUTH_SERVICE_PORT=3001
+      - USER_SERVICE_HOST=user-service
+      - USER_SERVICE_PORT=3002
     volumes:
       - ./services/post-service/src:/app/src
       - ./shared/src:/app/shared/src
@@ -52,12 +74,33 @@ services:
     build:
       context: .
       dockerfile: services/api-gateway/Dockerfile.dev
-      target: development
     container_name: microservices-gateway-dev
     environment:
       - NODE_ENV=development
+      - API_GATEWAY_PORT=${API_GATEWAY_PORT:-3000}
+      - AUTH_SERVICE_HOST=auth-service
+      - AUTH_SERVICE_PORT=3001
+      - USER_SERVICE_HOST=user-service
+      - USER_SERVICE_PORT=3002
+      - POST_SERVICE_HOST=post-service
+      - POST_SERVICE_PORT=3003
+      - RABBITMQ_URL=amqp://admin:password@rabbitmq:5672
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     volumes:
       - ./services/api-gateway/src:/app/src
       - ./shared/src:/app/shared/src
       - /app/node_modules
     command: npm run start:dev
+    ports:
+      - "3000:3000"
+    networks:
+      - microservices-network
+    depends_on:
+      - auth-service
+      - user-service
+      - post-service
+
+networks:
+  microservices-network:
+    external: true

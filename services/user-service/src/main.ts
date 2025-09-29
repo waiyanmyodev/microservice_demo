@@ -10,8 +10,8 @@ async function bootstrap() {
   const logger = new Logger('UserService');
 
   // Get configuration
-  const port = configService.get<number>('user.service.port');
-  const host = configService.get<string>('user.service.host');
+  const port = configService.get<number>('user.service.port') || 3002;
+  const host = configService.get<string>('user.service.host') || '0.0.0.0';
 
   // Configure microservice
   app.connectMicroservice<MicroserviceOptions>({
@@ -47,7 +47,7 @@ async function bootstrap() {
   logger.log(`🚀 User microservice is running on ${host}:${port}`);
 }
 
-bootstrap().catch((error) => {
+bootstrap().catch(error => {
   Logger.error('❌ Failed to start user service', error);
   process.exit(1);
 });

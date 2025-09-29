@@ -11,8 +11,8 @@ async function bootstrap() {
   const logger = new Logger('APIGateway');
 
   // Get configuration
-  const port = configService.get<number>('gateway.port');
-  const host = configService.get<string>('gateway.host');
+  const port = configService.get<number>('gateway.port') || 3000;
+  const host = configService.get<string>('gateway.host') || '0.0.0.0';
   const corsOrigin = configService.get<string[]>('gateway.cors.origin');
 
   // Security
@@ -61,12 +61,13 @@ async function bootstrap() {
   });
 
   await app.listen(port, host);
-  
+
   logger.log(`🚀 API Gateway is running on http://${host}:${port}`);
   logger.log(`📚 Swagger documentation available at http://${host}:${port}/api/docs`);
 }
 
-bootstrap().catch((error) => {
+bootstrap().catch(error => {
+  console.log(error);
   Logger.error('❌ Failed to start API Gateway', error);
   process.exit(1);
 });

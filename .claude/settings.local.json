@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)",
+      "Bash(npm install)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Bash(npm run:*)",
+      "Bash(DATABASE_URL=\"postgresql://postgres:password@localhost:5432/microservices_db?schema=public\" npx prisma migrate dev --name init)",
+      "Bash(DATABASE_URL=\"postgresql://postgres:password@localhost:5432/microservices_db?schema=public\" npm run db:seed)",
+      "Bash(DATABASE_URL=\"postgresql://postgres:password@localhost:5432/microservices_db?schema=public\" JWT_SECRET=\"super-secret-jwt-key-for-development\" JWT_REFRESH_SECRET=\"super-secret-refresh-key-for-development\" AUTH_SERVICE_PORT=3001 AUTH_SERVICE_HOST=localhost NODE_ENV=development npm run build --prefix services/auth-service)",
+      "Bash(ls)",
+      "Bash(ls:*)",
+      "Bash(./demo-api.sh:*)",
+      "Bash(USER_DATABASE_URL=\"postgresql://user_user:user_password@localhost:5434/user_db?schema=public\" npx prisma migrate dev --name init-user)",
+      "Bash(POST_DATABASE_URL=\"postgresql://post_user:post_password@localhost:5435/post_db?schema=public\" npx prisma migrate dev --name init-post)",
+      "Bash(AUTH_DATABASE_URL=\"postgresql://auth_user:auth_password@localhost:5433/auth_db?schema=public\" npx ts-node prisma/seed.ts)",
+      "Bash(AUTH_DATABASE_URL=\"postgresql://auth_user:auth_password@localhost:5433/auth_db?schema=public\" npx prisma generate)",
+      "Bash(USER_DATABASE_URL=\"postgresql://user_user:user_password@localhost:5434/user_db?schema=public\" npx prisma generate)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ],
+    "deny": []
+  }
+}

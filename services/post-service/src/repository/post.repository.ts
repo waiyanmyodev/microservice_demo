@@ -9,15 +9,9 @@ import {
   createPaginationResult,
 } from '@shared/common';
 
-export interface PostWithAuthor extends Post {
-  author: {
-    id: string;
-    username: string;
-    firstName: string | null;
-    lastName: string | null;
-    avatar: string | null;
-  };
-}
+// In microservices, we don't join author data at database level
+// Author data will be fetched separately from user service
+export type PostWithAuthor = Post;
 
 @Injectable()
 export class PostRepository implements OnModuleInit, OnModuleDestroy {
@@ -31,22 +25,13 @@ export class PostRepository implements OnModuleInit, OnModuleDestroy {
     await this.prisma.$disconnect();
   }
 
-  async create(createPostDto: CreatePostDto & { authorId: string; slug?: string }): Promise<PostWithAuthor> {
+  async create(
+    createPostDto: CreatePostDto & { authorId: string; slug?: string },
+  ): Promise<PostWithAuthor> {
     return this.prisma.post.create({
       data: {
         ...createPostDto,
         publishedAt: createPostDto.published ? new Date() : null,
-      },
-      include: {
-        author: {
-          select: {
-            id: true,
-            username: true,
-            firstName: true,
-            lastName: true,
-            avatar: true,
-          },
-        },
       },
     });
   }
@@ -65,7 +50,7 @@ export class PostRepository implements OnModuleInit, OnModuleDestroy {
 
     // Build where clause
     const where: any = {};
-    
+
     if (published !== undefined) {
       where.published = published;
     }
@@ -98,17 +83,6 @@ export class PostRepository implements OnModuleInit, OnModuleDestroy {
       skip,
       take,
       orderBy: { [sortBy]: sortOrder },
-      include: {
-        author: {
-          select: {
-            id: true,
-            username: true,
-            firstName: true,
-            lastName: true,
-            avatar: true,
-          },
-        },
-      },
     });
 
     return createPaginationResult(posts, total, page, limit);
@@ -117,44 +91,25 @@ export class PostRepository implements OnModuleInit, OnModuleDestroy {
   async findById(id: string): Promise<PostWithAuthor | null> {
     return this.prisma.post.findUnique({
       where: { id },
-      include: {
-        author: {
-          select: {
-            id: true,
-            username: true,
-            firstName: true,
-            lastName: true,
-            avatar: true,
-          },
-        },
-      },
     });
   }
 
   async findBySlug(slug: string): Promise<PostWithAuthor | null> {
     return this.prisma.post.findUnique({
       where: { slug },
-      include: {
-        author: {
-          select: {
-            id: true,
-            username: true,
-            firstName: true,
-            lastName: true,
-            avatar: true,
-          },
-        },
-      },
     });
   }
 
-  async findByAuthor(authorId: string, query: PostQueryDto): Promise<PaginationResult<PostWithAuthor>> {
+  async findByAuthor(
+    authorId: string,
+    query: PostQueryDto,
+  ): Promise<PaginationResult<PostWithAuthor>> {
     return this.findAll({ ...query, authorId });
   }
 
   async update(id: string, updatePostDto: UpdatePostDto): Promise<PostWithAuthor> {
     const updateData: any = { ...updatePostDto };
-    
+
     // Update publishedAt if published status changes
     if (updatePostDto.published !== undefined) {
       updateData.publishedAt = updatePostDto.published ? new Date() : null;
@@ -163,17 +118,6 @@ export class PostRepository implements OnModuleInit, OnModuleDestroy {
     return this.prisma.post.update({
       where: { id },
       data: updateData,
-      include: {
-        author: {
-          select: {
-            id: true,
-            username: true,
-            firstName: true,
-            lastName: true,
-            avatar: true,
-          },
-        },
-      },
     });
   }
 

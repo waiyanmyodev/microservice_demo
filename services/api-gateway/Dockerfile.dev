@@ -1,0 +1,30 @@
+# Development Dockerfile for API Gateway
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install dependencies for development
+RUN apk add --no-cache git
+
+# Copy package files
+COPY package*.json ./
+COPY shared/package*.json ./shared/
+COPY services/api-gateway/package*.json ./services/api-gateway/
+
+# Install ALL dependencies (including dev dependencies) and NestJS CLI globally
+RUN npm ci && npm cache clean --force && npm install -g @nestjs/cli
+
+# Copy source code
+COPY . .
+
+# Build shared library
+RUN npm run build:shared
+
+# Set working directory to the service
+WORKDIR /app/services/api-gateway
+
+# Expose port
+EXPOSE 3000
+
+# Start in development mode with hot reloading
+CMD ["npm", "run", "start:dev"]

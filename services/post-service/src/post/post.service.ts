@@ -7,8 +7,6 @@ import {
   PostSummaryDto,
   PaginationResult,
   PostNotFoundException,
-  ValidationException,
-  SUCCESS_MESSAGES,
   slugify,
   generateExcerpt,
 } from '@shared/common';
@@ -21,7 +19,7 @@ export class PostService {
   async create(createPostDto: CreatePostDto, authorId: string): Promise<PostResponseDto> {
     // Generate slug from title if not provided
     let slug = createPostDto.title ? slugify(createPostDto.title) : null;
-    
+
     // Ensure slug is unique
     if (slug) {
       let counter = 0;
@@ -39,7 +37,7 @@ export class PostService {
     const post = await this.postRepository.create({
       ...createPostDto,
       authorId,
-      slug,
+      slug: slug || undefined,
       excerpt,
     });
 
@@ -48,7 +46,7 @@ export class PostService {
 
   async findAll(query: PostQueryDto): Promise<PaginationResult<PostSummaryDto>> {
     const result = await this.postRepository.findAll(query);
-    
+
     return {
       ...result,
       items: result.items.map(this.transformToSummaryDto),
@@ -71,9 +69,12 @@ export class PostService {
     return this.transformToResponseDto(post);
   }
 
-  async findByAuthor(authorId: string, query: PostQueryDto): Promise<PaginationResult<PostSummaryDto>> {
+  async findByAuthor(
+    authorId: string,
+    query: PostQueryDto,
+  ): Promise<PaginationResult<PostSummaryDto>> {
     const result = await this.postRepository.findByAuthor(authorId, query);
-    
+
     return {
       ...result,
       items: result.items.map(this.transformToSummaryDto),
@@ -90,8 +91,8 @@ export class PostService {
 
     // Update slug if title changed
     if (updatePostDto.title && updatePostDto.title !== existingPost.title) {
-      let slug = slugify(updatePostDto.title);
-      
+      const slug = slugify(updatePostDto.title);
+
       // Ensure slug is unique
       let counter = 0;
       let uniqueSlug = slug;
@@ -158,21 +159,22 @@ export class PostService {
       id: post.id,
       title: post.title,
       content: post.content,
-      excerpt: post.excerpt,
-      slug: post.slug,
+      excerpt: post.excerpt || undefined,
+      slug: post.slug || undefined,
       published: post.published,
       authorId: post.authorId,
+      // TODO: In a real implementation, fetch author data from user service
       author: {
-        id: post.author.id,
-        username: post.author.username,
-        firstName: post.author.firstName,
-        lastName: post.author.lastName,
-        avatar: post.author.avatar,
+        id: post.authorId,
+        username: 'loading...',
+        firstName: undefined,
+        lastName: undefined,
+        avatar: undefined,
       },
       tags: post.tags,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
-      publishedAt: post.publishedAt,
+      publishedAt: post.publishedAt || undefined,
     };
   }
 
@@ -180,19 +182,20 @@ export class PostService {
     return {
       id: post.id,
       title: post.title,
-      excerpt: post.excerpt,
-      slug: post.slug,
+      excerpt: post.excerpt || undefined,
+      slug: post.slug || undefined,
       published: post.published,
+      // TODO: In a real implementation, fetch author data from user service
       author: {
-        id: post.author.id,
-        username: post.author.username,
-        firstName: post.author.firstName,
-        lastName: post.author.lastName,
-        avatar: post.author.avatar,
+        id: post.authorId,
+        username: 'loading...',
+        firstName: undefined,
+        lastName: undefined,
+        avatar: undefined,
       },
       tags: post.tags,
       createdAt: post.createdAt,
-      publishedAt: post.publishedAt,
+      publishedAt: post.publishedAt || undefined,
     };
   }
 }

@@ -25,6 +25,7 @@ COPY --from=deps /app/node_modules ./node_modules
 
 # Build the application
 RUN npm run build:shared
+RUN cd services/auth-service && npx prisma generate
 RUN cd services/auth-service && npm run build
 
 # Production stage

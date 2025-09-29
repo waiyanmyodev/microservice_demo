@@ -9,10 +9,9 @@ import {
   PaginationResult,
   UserNotFoundException,
   UserAlreadyExistsException,
-  ValidationException,
-  SUCCESS_MESSAGES,
 } from '@shared/common';
 import { UserRepository } from '../repository/user.repository';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -42,13 +41,15 @@ export class UserService {
       password: hashedPassword,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...userResponse } = user;
-    return userResponse as UserResponseDto;
+    return this.transformUserToResponse(user);
   }
 
   async findAll(query: UserQueryDto): Promise<PaginationResult<UserResponseDto>> {
-    return this.userRepository.findAll(query);
+    const result = await this.userRepository.findAll(query);
+    return {
+      ...result,
+      items: result.items.map(user => this.transformUserToResponse(user)),
+    };
   }
 
   async findById(id: string): Promise<UserResponseDto> {
@@ -56,7 +57,7 @@ export class UserService {
     if (!user) {
       throw new UserNotFoundException();
     }
-    return user as UserResponseDto;
+    return this.transformUserToResponse(user);
   }
 
   async findByEmail(email: string): Promise<UserResponseDto | null> {
@@ -64,9 +65,7 @@ export class UserService {
     if (!user) {
       return null;
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...userResponse } = user;
-    return userResponse as UserResponseDto;
+    return this.transformUserToResponse(user);
   }
 
   async getProfile(id: string): Promise<UserProfileDto> {
@@ -75,21 +74,20 @@ export class UserService {
       throw new UserNotFoundException();
     }
 
-    const fullName = user.firstName && user.lastName 
-      ? `${user.firstName} ${user.lastName}` 
-      : null;
+    const fullName =
+      user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : undefined;
 
     return {
       id: user.id,
       email: user.email,
       username: user.username,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      firstName: user.firstName || undefined,
+      lastName: user.lastName || undefined,
       fullName,
-      avatar: user.avatar,
-      bio: user.bio,
-      location: user.location,
-      website: user.website,
+      avatar: user.avatar || undefined,
+      bio: user.bio || undefined,
+      location: user.location || undefined,
+      website: user.website || undefined,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
@@ -118,7 +116,7 @@ export class UserService {
     }
 
     const updatedUser = await this.userRepository.update(id, updateUserDto);
-    return updatedUser as UserResponseDto;
+    return this.transformUserToResponse(updatedUser);
   }
 
   async delete(id: string): Promise<void> {
@@ -132,5 +130,22 @@ export class UserService {
 
   async exists(id: string): Promise<boolean> {
     return this.userRepository.exists(id);
+  }
+
+  private transformUserToResponse(user: User): UserResponseDto {
+    return {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      firstName: user.firstName || undefined,
+      lastName: user.lastName || undefined,
+      avatar: user.avatar || undefined,
+      bio: user.bio || undefined,
+      location: user.location || undefined,
+      website: user.website || undefined,
+      isActive: user.isActive,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
   }
 }

@@ -1,7 +1,6 @@
 // Auth Service Database Schema
 generator client {
   provider = "prisma-client-js"
-  output   = "../../../node_modules/.prisma/auth-client"
 }
 
 datasource db {
