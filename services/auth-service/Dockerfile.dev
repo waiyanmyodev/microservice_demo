@@ -3,16 +3,19 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install dependencies for development
-RUN apk add --no-cache git
+# Install dependencies for development and native compilation
+RUN apk add --no-cache git python3 make g++ openssl openssl-dev
 
 # Copy package files
 COPY package*.json ./
 COPY shared/package*.json ./shared/
 COPY services/auth-service/package*.json ./services/auth-service/
 
-# Install ALL dependencies (including dev dependencies) and NestJS CLI globally
-RUN npm ci && npm cache clean --force && npm install -g @nestjs/cli
+# Install root dependencies first
+RUN npm ci && npm cache clean --force
+
+# Install NestJS CLI globally
+RUN npm install -g @nestjs/cli
 
 # Copy source code
 COPY . .
@@ -20,11 +23,15 @@ COPY . .
 # Build shared library
 RUN npm run build:shared
 
-# Generate Prisma client
-RUN cd services/auth-service && npx prisma generate
-
-# Set working directory to the service
+# Set working directory to the service and install service-specific dependencies
 WORKDIR /app/services/auth-service
+RUN npm ci --include=dev
+
+# Rebuild native modules like bcrypt for the container architecture
+RUN npm rebuild bcrypt --build-from-source
+
+# Generate Prisma client
+RUN npx prisma generate
 
 # Expose port
 EXPOSE 3001

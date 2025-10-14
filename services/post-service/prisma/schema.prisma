@@ -1,7 +1,8 @@
 // Post Service Database Schema
 generator client {
-  provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/post-client"
+  provider      = "prisma-client-js"
+  output        = "../node_modules/.prisma/post-client"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {

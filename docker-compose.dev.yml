@@ -9,12 +9,13 @@ services:
     container_name: microservices-auth-dev
     environment:
       - NODE_ENV=development
-      - AUTH_DATABASE_URL=postgresql://auth_user:auth_password@auth-db:5432/auth_db?schema=public
+      - AUTH_DATABASE_URL=postgresql://auth_user:auth_password@auth-database:5432/auth_db?schema=public
       - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-this-in-production}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-your-super-secret-refresh-jwt-key-change-this-in-production}
       - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-15m}
       - JWT_REFRESH_EXPIRES_IN=${JWT_REFRESH_EXPIRES_IN:-7d}
       - AUTH_SERVICE_PORT=${AUTH_SERVICE_PORT:-3001}
+      - AUTH_SERVICE_TCP_PORT=${AUTH_SERVICE_TCP_PORT:-3011}
       - RABBITMQ_URL=amqp://admin:password@rabbitmq:5672
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -23,6 +24,8 @@ services:
       - ./shared/src:/app/shared/src
       - /app/node_modules
     command: npm run start:dev
+    networks:
+      - microservices-network
 
   # User Service - Development
   user-service:
@@ -32,8 +35,9 @@ services:
     container_name: microservices-user-dev
     environment:
       - NODE_ENV=development
-      - USER_DATABASE_URL=postgresql://user_user:user_password@user-db:5432/user_db?schema=public
+      - USER_DATABASE_URL=postgresql://user_user:user_password@user-database:5432/user_db?schema=public
       - USER_SERVICE_PORT=${USER_SERVICE_PORT:-3002}
+      - USER_SERVICE_TCP_PORT=${USER_SERVICE_TCP_PORT:-3012}
       - RABBITMQ_URL=amqp://admin:password@rabbitmq:5672
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -45,6 +49,8 @@ services:
       - ./shared/src:/app/shared/src
       - /app/node_modules
     command: npm run start:dev
+    networks:
+      - microservices-network
 
   # Post Service - Development
   post-service:
@@ -54,8 +60,9 @@ services:
     container_name: microservices-post-dev
     environment:
       - NODE_ENV=development
-      - POST_DATABASE_URL=postgresql://post_user:post_password@post-db:5432/post_db?schema=public
+      - POST_DATABASE_URL=postgresql://post_user:post_password@post-database:5432/post_db?schema=public
       - POST_SERVICE_PORT=${POST_SERVICE_PORT:-3003}
+      - POST_SERVICE_TCP_PORT=${POST_SERVICE_TCP_PORT:-3013}
       - RABBITMQ_URL=amqp://admin:password@rabbitmq:5672
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -68,6 +75,8 @@ services:
       - ./shared/src:/app/shared/src
       - /app/node_modules
     command: npm run start:dev
+    networks:
+      - microservices-network
 
   # API Gateway - Development
   api-gateway:

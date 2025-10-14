@@ -11,8 +11,11 @@ COPY package*.json ./
 COPY shared/package*.json ./shared/
 COPY services/api-gateway/package*.json ./services/api-gateway/
 
-# Install ALL dependencies (including dev dependencies) and NestJS CLI globally
-RUN npm ci && npm cache clean --force && npm install -g @nestjs/cli
+# Install root dependencies first
+RUN npm ci && npm cache clean --force
+
+# Install NestJS CLI globally
+RUN npm install -g @nestjs/cli
 
 # Copy source code
 COPY . .
@@ -20,11 +23,9 @@ COPY . .
 # Build shared library
 RUN npm run build:shared
 
-# Set working directory to the service
+# Set working directory to the service and install service-specific dependencies
 WORKDIR /app/services/api-gateway
-
-# Install service-specific dependencies
-RUN npm ci
+RUN npm ci --include=dev
 
 # Expose port
 EXPOSE 3000
