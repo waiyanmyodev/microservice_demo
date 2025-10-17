@@ -20,9 +20,11 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     volumes:
-      - ./services/auth-service/src:/app/src
+      - ./services/auth-service/src:/app/services/auth-service/src
       - ./shared/src:/app/shared/src
+      - ./shared/dist:/app/shared/dist
       - /app/node_modules
+      - /app/services/auth-service/node_modules
     command: npm run start:dev
     networks:
       - microservices-network
@@ -44,10 +46,12 @@ services:
       - AUTH_SERVICE_HOST=auth-service
       - AUTH_SERVICE_PORT=3001
     volumes:
-      - ./services/user-service/src:/app/src
-      - ./services/user-service/prisma:/app/prisma
+      - ./services/user-service/src:/app/services/user-service/src
+      - ./services/user-service/prisma:/app/services/user-service/prisma
       - ./shared/src:/app/shared/src
+      - ./shared/dist:/app/shared/dist
       - /app/node_modules
+      - /app/services/user-service/node_modules
     command: npm run start:dev
     networks:
       - microservices-network
@@ -71,9 +75,11 @@ services:
       - USER_SERVICE_HOST=user-service
       - USER_SERVICE_PORT=3002
     volumes:
-      - ./services/post-service/src:/app/src
+      - ./services/post-service/src:/app/services/post-service/src
       - ./shared/src:/app/shared/src
+      - ./shared/dist:/app/shared/dist
       - /app/node_modules
+      - /app/services/post-service/node_modules
     command: npm run start:dev
     networks:
       - microservices-network
@@ -97,9 +103,11 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     volumes:
-      - ./services/api-gateway/src:/app/src
+      - ./services/api-gateway/src:/app/services/api-gateway/src
       - ./shared/src:/app/shared/src
+      - ./shared/dist:/app/shared/dist
       - /app/node_modules
+      - /app/services/api-gateway/node_modules
     command: npm run start:dev
     ports:
       - "3000:3000"
@@ -112,4 +120,4 @@ services:
 
 networks:
   microservices-network:
-    external: true
+    driver: bridge
