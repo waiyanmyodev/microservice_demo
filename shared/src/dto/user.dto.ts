@@ -20,6 +20,10 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   lastName?: string;
+
+  @IsOptional()
+  @IsString()
+  phone?: string;
 }
 
 export class UpdateUserDto {
@@ -39,6 +43,10 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   lastName?: string;
+
+  @IsOptional()
+  @IsString()
+  phone?: string;
 
   @IsOptional()
   @IsUrl()
@@ -69,6 +77,7 @@ export class UserResponseDto {
   username: string;
   firstName?: string;
   lastName?: string;
+  phone?: string;
   avatar?: string;
   bio?: string;
   location?: string;
@@ -85,6 +94,7 @@ export class UserProfileDto {
   firstName?: string;
   lastName?: string;
   fullName?: string;
+  phone?: string;
   avatar?: string;
   bio?: string;
   location?: string;

@@ -37,6 +37,9 @@ export enum MessagePatterns {
   AUTH_REFRESH = 'auth.refresh',
   AUTH_VALIDATE = 'auth.validate',
   AUTH_LOGOUT = 'auth.logout',
+  AUTH_GENERATE_TOKEN = 'auth.generateToken',
+  LOGIN_WITH_EMAIL = 'auth.loginWithEmail',
+  LOGIN_WITH_GOOGLE = 'auth.loginWithGoogle',
 
   // User patterns
   USER_CREATE = 'user.create',
@@ -46,6 +49,7 @@ export enum MessagePatterns {
   USER_UPDATE = 'user.update',
   USER_DELETE = 'user.delete',
   USER_GET_PROFILE = 'user.getProfile',
+  USER_VALIDATE_CREDENTIALS = 'user.validateCredentials',
 
   // Post patterns
   POST_CREATE = 'post.create',
